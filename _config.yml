@@ -6,7 +6,7 @@ highlighter:      rouge
 title:            David blog
 tagline:          'A .net developer blog'
 description:      'A .Net blog '
-url:              https://github.com/divad4686
+url:              https://divad4686.github.io
 baseurl:          # the optional subpath of your site, e.g. "/blog"
                   # NB: This applies to all pages in your Jekyll site.
                   # If you want to move just the blog index pages but keep
@@ -35,4 +35,7 @@ sidebar_home_link:  true
                                 # set this to the root of the paginate_path
                                 # to enable a separate blog link.
 github:
-  repo:             https://github.com/divad4686/divad4686.github.io
+  repo:             https://github.com/divad4686/
+
+twitter: https://twitter.com/divad4686
+linkedIn: https://www.linkedin.com/in/divad4686/
