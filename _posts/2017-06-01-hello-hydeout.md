@@ -1,7 +1,7 @@
 ---
+title: Hello David
 layout: post
-title: Hello Hydeout
-excerpt_separator:  <!--more-->
+excerpt_separator: "<!--more-->"
 ---
 
 Hydeout updates the original [Hyde](https://github.com/poole/hyde)
