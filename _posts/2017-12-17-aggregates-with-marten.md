@@ -171,7 +171,7 @@ switch (@event)
 {% endhighlight %}
 We can put this function inside a static method, and use the Linq aggregate function to construct our own:
 {% highlight c# %}
-private static QuestPartyF Aggregator(QuestParty state, object @event)
+private static QuestParty Aggregator(QuestParty state, object @event)
 {
     switch (@event)
     {
@@ -188,7 +188,7 @@ private static QuestPartyF Aggregator(QuestParty state, object @event)
     return state;
 }
 
-public static QuestPartyF Aggregate(List<object> events) => events.Aggregate(new QuestParty(), Aggregator);
+public static QuestParty Aggregate(List<object> events) => events.Aggregate(new QuestParty(), Aggregator);
 {% endhighlight %}
 Notice that we are using an empty constructor for QuestParty, since we are not using Marten Aggregate anymore, we can remove the id attribute from our class.
 
