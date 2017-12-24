@@ -2,11 +2,12 @@
 layout: post
 title: Aggregates with Marten
 excerpt_separator: <!--more-->
+hidden: true
 ---
 
 In my current project we have been using [Marten](https://github.com/JasperFx/marten) as an event sourcing database.
 
-Marten is a great library that have saved us a lot of time and pain, but we encounter some small use case where we changed the way we create our aggregates. If you want to apply two or more aggregates to the same stream using the [Aggregate function](http://jasperfx.github.io/marten/documentation/events/projections/#sec4) you will hit your database multiple times, making it in some case better to just load your stream of events once and them create your aggregates from there.
+Marten is a great library that have saved us a lot of time and pain, but we encounter some small use case where we changed the way we create our aggregates. If you want to generate two or more aggregates on the same stream and same transaction using the [Aggregate function](http://jasperfx.github.io/marten/documentation/events/projections/#sec4) you will hit your database multiple times, making it in some case better to just load your stream of events once and them create your aggregates from there.
 
 Lets see how we improved this by using a fantasy quests example, similar to the one in [marten documentation](http://jasperfx.github.io/marten/documentation/events/) for the Event Store.
 
