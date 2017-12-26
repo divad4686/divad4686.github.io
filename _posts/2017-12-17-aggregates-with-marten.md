@@ -264,7 +264,7 @@ If you need to create an aggregate from a single event you can overload the aggr
 {% highlight c# %}
 public static QuestParty Aggregate(object @event) => Aggregate(new List<object> { @event });
 {% endhighlight %}
-Our controller looks similar from our last version, we only remove the need to pass the id multiple times as a parameter:
+Our controller looks similar from the last version, we only remove the need to pass the id multiple times as a parameter:
 {% highlight c# %}
 [HttpGet("questInfoFunctional/{id}")]
 public async Task<IActionResult> GetFunctional(Guid id)
