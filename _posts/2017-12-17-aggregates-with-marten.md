@@ -143,8 +143,8 @@ public async Task<IActionResult> GetWithDynamic(Guid id)
         var events = (await session.Events.FetchStreamAsync(id)).Select(@event => @event.Data).ToList();
         return Ok(new
         {
-            Quest = QuestParty.Reduce(id, events),
-            Monsters = MonstersSlayed.Reduce(id, events)
+            Quest = QuestParty.Aggregate(id, events),
+            Monsters = MonstersSlayed.Aggregate(id, events)
         });
     }
 }
@@ -153,8 +153,8 @@ public async Task<IActionResult> GetWithDynamic(Guid id)
 This code have some flaws, the use of try catch in this case is pretty inefficient, verbose, and hard to read and maintain. 
 
 Lets use some functional and defensive programming techniques to protect our code from errors, and make it easier to test and maintain.
-# Patter matching
-Instead of having different Apply functions, we can use the c# 7 feature for [patter matching](https://docs.microsoft.com/en-us/dotnet/csharp/pattern-matching), using the type of the object to select the correct Apply function, and skipping in case there is no match for the event we are tying to apply:
+# Pattern matching
+Instead of having different Apply functions, we can use the c# 7 feature for [pattern matching](https://docs.microsoft.com/en-us/dotnet/csharp/pattern-matching), using the type of the object to select the correct Apply function, and skipping in case there is no match for the event we are tying to apply:
 {% highlight c# %}
 switch (@event)
 {
@@ -190,11 +190,11 @@ private static QuestParty Aggregator(QuestParty state, object @event)
 
 public static QuestParty Aggregate(List<object> events) => events.Aggregate(new QuestParty(), Aggregator);
 {% endhighlight %}
-Notice that we are using an empty constructor for QuestParty, since we are not using Marten Aggregate anymore, we can remove the id attribute from our class.
+Notice that we are using an empty constructor for QuestParty. Since we are not using Marten Aggregate anymore, we can remove the id attribute from our class.
 
 We can also make the constructor private, so we only allow creations of the aggregate with a List of Events through our static method.
 
-As a side note, marten [allows](http://jasperfx.github.io/marten/documentation/events/projections/#sec6) to make the Apply methods private, but I'm not sure if you can do the same with the constructor or id attribute.
+As a side note, marten [allows](http://jasperfx.github.io/marten/documentation/events/projections/#sec6) to make the Apply methods private, but I'm not sure that you can do the same with the constructor or id attribute.
 
 The final version of the aggregates:
 
@@ -216,7 +216,7 @@ public class QuestParty
 
     public override string ToString() => $"Quest party '{Name}' is {Members.Join(", ")}";
 
-    private static QuestPartyF Aggregator(QuestParty state, object @event)
+    private static QuestParty Aggregator(QuestParty state, object @event)
     {
         switch (@event)
         {
@@ -262,7 +262,7 @@ public class MonstersSlayed
 {% endhighlight %}
 If you need to create an aggregate from a single event you can overload the aggregate function:
 {% highlight c# %}
-public static QuestPartyF Aggregate(object @event) => Aggregate(new List<object> { @event });
+public static QuestParty Aggregate(object @event) => Aggregate(new List<object> { @event });
 {% endhighlight %}
 Our controller looks similar from our last version, we only remove the need to pass the id multiple times as a parameter:
 {% highlight c# %}
@@ -282,9 +282,9 @@ public async Task<IActionResult> GetFunctional(Guid id)
 {% endhighlight %}
 # Immutability
 
-From outside our aggregates are immutables, we can not construct or modify them, only make new ones with our static aggregate function, but will the Haskell gods be happy with this implementation? I don't think so! we are still modifying the same object inside our Aggregator function. To make it really immutable we should create a new object inside each case of our switch pattern matching, maybe using the [fluent builder pattern](http://blog.ploeh.dk/2017/08/21/generalised-test-data-builder/)
+From outside our aggregates are immutables, we can not construct or modify them, only make new ones with our static aggregate function, but will the Haskell gods be happy with this implementation? I don't think so! we are still modifying the same object inside our Aggregator function. To make it really immutable we should create a new object in each case of the pattern matching, maybe using the [fluent builder pattern](http://blog.ploeh.dk/2017/08/21/generalised-test-data-builder/)
 
-I don't like this option because it makes the code really verbose, it would be nice if C# had a more elegant 'copy and update' method like [F#](https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/copy-and-update-record-expressions), [Haskell](https://stackoverflow.com/questions/14955627/shorthand-way-for-assigning-a-single-field-in-a-record-while-copying-the-rest-o), [Kotlin](https://kotlinlang.org/docs/reference/data-classes.html#copying), [Clojure](https://clojuredocs.org/clojure.core/update), [and](https://doc.rust-lang.org/book/first-edition/structs.html#update-syntax), [many](https://realworldocaml.org/v1/en/html/records.html#functional-updates), [others](https://docs.scala-lang.org/tour/case-classes.html#copying).
+I don't like this option because it makes the code really verbose. It would be nice if C# had a more elegant 'copy and update' method like [F#](https://docs.microsoft.com/en-us/dotnet/fsharp/language-reference/copy-and-update-record-expressions), [Haskell](https://stackoverflow.com/questions/14955627/shorthand-way-for-assigning-a-single-field-in-a-record-while-copying-the-rest-o), [Kotlin](https://kotlinlang.org/docs/reference/data-classes.html#copying), [Clojure](https://clojuredocs.org/clojure.core/update), [and](https://doc.rust-lang.org/book/first-edition/structs.html#update-syntax), [many](https://realworldocaml.org/v1/en/html/records.html#functional-updates), [others](https://docs.scala-lang.org/tour/case-classes.html#copying).
 
 # When to use this?
 The technique I show above have some advantages over using Marten aggregate feature, like immutability and making only a single call to our database. But it also have some drawbacks.
@@ -294,4 +294,4 @@ When using Marten aggregate function, the library does some query optimization, 
 You can check the code used for this example in [this repository](https://github.com/divad4686/marten-example/).
 Clone, execute run.sh and check it at http://localhost:82/swagger
 
-And many thanks to [@jeremydmiller](https://twitter.com/jeremydmiller) and the rest of [contributors](https://github.com/JasperFx/marten/graphs/contributors) of marten for such an awesome library!
+Many thanks to [@jeremydmiller](https://twitter.com/jeremydmiller) and the rest of [contributors](https://github.com/JasperFx/marten/graphs/contributors) of marten for such an awesome library!
