@@ -5,9 +5,16 @@ sidebar_link: true
 ---
 
 <p class="message">
-  Hey there! This page is included as an example. Feel free to customize it
-  for your own use upon downloading. Carry on!
+  Back-end developer. Currently working with .Net core, asynchronous workflow/communication with rabbitMQ and brighter, event sourcing with Marten and CI/CD with docker, vsts, aws and bash scripts.
+
+
+</p>
+<p class="message">
+Great interest in functional programming, f#, CQRS, event sourcing and docker.
 </p>
 
-To make pages show up in the sidebar, add `sidebar_link: true` to the front
-matter.
+<ul class="share-buttons about-icons">
+        <li><a href="https://github.com/divad4686/" target="_blank" title="Github">{% include svg/github.svg %}</a></li>
+        <li><a href="https://twitter.com/divad4686/" target="_blank" title="Twitter">{% include svg/share/Twitter.svg %}</a></li>
+        <li><a href="https://www.linkedin.com/in/divad4686/" target="_blank" title="LinkedIn">{% include svg/share/LinkedIn.svg %}</a></li>
+</ul>
