@@ -2,7 +2,6 @@
 layout: post
 title: Aggregates with Marten
 excerpt_separator: <!--more-->
-hidden: true
 ---
 
 In my current project we have been using [Marten](https://github.com/JasperFx/marten) as an event sourcing database.
