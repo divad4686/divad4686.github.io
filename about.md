@@ -16,7 +16,7 @@ sidebar_link: true
 </p>
 <p class="message">
   My main interest right now are Event Sourcing, CQRS, Docker, C.I / C.D. Automatic testings with docker.
-  Also getting to get more into functional programming, specially with F#
+  Also have a great interest in functional programming, specially with F#, but also appling some of this principles in C#.
 </p>
 
 <ul class="share-buttons about-icons">
