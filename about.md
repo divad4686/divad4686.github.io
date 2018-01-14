@@ -3,7 +3,6 @@ layout: page
 title: About
 sidebar_link: true
 ---
-
 <p>  
   Back-end developer living in Barcelona. Current stack:
   <ul>
@@ -16,7 +15,8 @@ sidebar_link: true
   </ul>
 </p>
 <p class="message">
-  My main interests right now are in Event Sourcing, CQRS, Docker and functional programming
+  My main interest right now are Event Sourcing, CQRS, Docker, C.I / C.D. Automatic testings with docker.
+  Also getting to get more into functional programming, specially with F#
 </p>
 
 <ul class="share-buttons about-icons">
