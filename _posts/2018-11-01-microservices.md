@@ -16,12 +16,17 @@ For example, in my current project we are creating a new Notifications service. 
 
 There are different ways to extract this type of data, they all have some pros and cons, some of them are generally better, but in the end it depends of your use case. 
 
+There are two main ways to access the data needed from the monolith, you can synchronously request the data to the monolith when you need it, or you can store a copy of the data (a cache) you need from the monolith in your local database, in this case you will have to apply a strategy to synchronize your local db with the monolith DB.
+
+# Accessing the data directly
+Depending on the data you need to get, this may also put a heavy load in the main database, specially at peak time. The second problem is that you have a direct dependency on a system that is very prone to errors or going down (thats why you are splitting your monolith right?), this could take your microservice down very easily, return errors to your users, or worse, hang up until a timeout is approached.
+
+There are two options for this solution, access the database directly from your microservice or create an api on top of the monolith.
+
 ## Connecting directly to the database
 This is the most straightforward, just pass the connection string to your service and go directly to the source of the data you need. This pose some problems though.
 
-First, any change in the database could break your service, you will be extremely coupled to the main database schema, taking away some of the benefits of creating a separate service, like independent deployments. 
-
-Depending on the query you need to do, this may also put a heavy load in the database, specially at peak time, since the data access will be synchronous from the new service it becomes hard to control when the new domain can access the data.
+First, any change in the database could break your service, you will be extremely coupled to the main database schema, taking away some of the benefits of creating a separate service, like independent deployments.
 
 Testing can also be very difficult with this approach. In modern developments is increasingly more common to deploy your dependencies locally with docker, including recreating your database anytime you want, for example, when running integration tests. 
 
@@ -37,6 +42,11 @@ It have the same problem of being a synchronous call, possible putting a heavy l
 The testing can become a bit easier, by providing a 'sandbox' call where you return fake data. 
 
 It is still a pretty fast and straightforward solution, but it adds a new point of failure for your application, meaning you will need more tests for the new API, and possible new deployments.
+
+# Creating a local copy of the data
+This solutions usually take more time to develop, and you will also have to deal with [Eventual consistency problems](https://en.wikipedia.org/wiki/Eventual_consistency). But they are also more resilience and less prone to failures.
+
+This solutions usually 
 
 ## Enterprise solutions
 Some databases vendors have solutions for this type of data extraction, but this solutions tend to be on their very expensive enterprise packages. For example, [Oracle GoldenGate](https://www.oracle.com/middleware/technologies/goldengate.html) allows you to stream data from a Oracle database to other systems. If you are using Azure SQL (there are solution)[https://docs.microsoft.com/en-us/azure/sql-database/sql-database-sync-data] to extract data out of it, but this could imply a tight vendor lock-in.
