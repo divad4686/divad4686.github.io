@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Unit testing functional
+title: Data out of monolith
 excerpt_separator: <!--more-->
 hidden: true
 ---
@@ -19,8 +19,33 @@ There are different ways to extract this type of data, they all have some pros a
 ## Connecting directly to the database
 This is the most straightforward, just pass the connection string to your service and go directly to the source of the data you need. This pose some problems though.
 
-First, any change in the database could break your service, you will be extremely coupled to the main database, taking away a of the benefits of creating a separate service, like independent deployments. 
+First, any change in the database could break your service, you will be extremely coupled to the main database schema, taking away some of the benefits of creating a separate service, like independent deployments. 
+
+Depending on the query you need to do, this may also put a heavy load in the database, specially at peak time, since the data access will be synchronous from the new service it becomes hard to control when the new domain can access the data.
 
 Testing can also be very difficult with this approach. In modern developments is increasingly more common to deploy your dependencies locally with docker, including recreating your database anytime you want, for example, when running integration tests. 
 
 Chances are this is will be impossible with a monolithic database. Running the migration scripts on a 5 year behemoth could take a really long time, and filling test data in a database with tables spamming foreign keys around multiple places could be a complete nightmare. 
+
+The advantage of this solution is that it is really fast to implement and fairly simple, making it less likely to fail, but also really hard to evolve.
+
+## API on top of the database
+This is a very common solution, it have the advantage over accessing directly the database that versioning at the API level is easier. Changes in the database schema can be handle in the API instead of breaking the new service accessing the data directly. 
+
+It have the same problem of being a synchronous call, possible putting a heavy load on the database, and being prone network fails at critical moments. 
+
+The testing can become a bit easier, by providing a 'sandbox' call where you return fake data. 
+
+It is still a pretty fast and straightforward solution, but it adds a new point of failure for your application, meaning you will need more tests for the new API, and possible new deployments.
+
+## Enterprise solutions
+Some databases vendors have solutions for this type of data extraction, but this solutions tend to be on their very expensive enterprise packages. For example, [Oracle GoldenGate](https://www.oracle.com/middleware/technologies/goldengate.html) allows you to stream data from a Oracle database to other systems. If you are using Azure SQL (there are solution)[https://docs.microsoft.com/en-us/azure/sql-database/sql-database-sync-data] to extract data out of it, but this could imply a tight vendor lock-in.
+
+If you are using kafka, there is also a solution called (confluent)[https://www.confluent.io/]. They provide connectors to extract data out of a database to kafka, usually by streaming the event log of the engine to kafka, and also to unload data from kafka to another system. The main drawback of this solutions is that building and maintaining a kafka cluster can be hard and quite expensive in resources. Some of the connectors are also on early stage development, and they may not be reliable in a production environment. 
+
+## ETL
+## The outbox pattern 
+This is a solution we are using in my current project. 
+
+
+
