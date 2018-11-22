@@ -4,12 +4,12 @@ title: Data out of monolith
 excerpt_separator: <!--more-->
 hidden: true
 ---
-Going from a monolith to a full microservices architecture is [not an easy task](https://segment.com/blog/goodbye-microservices/), and one of the hardest part is breaking the database and choosing what should move to the new storage, and what should stay in the monolith.
+Going from a monolith to a full microservices architecture is [not an easy task](https://segment.com/blog/goodbye-microservices/), and one of the hardest part is breaking the database and choosing what should be move to the new storage, and what should stay in the monolith.
 
 Usually the new service will own part o the data previously in the original DB, and sometimes this data will have to be shared back to the monolith, likewise the new service will also have dependencies on data from the monolith. 
 ![](https://drive.google.com/uc?export=view&id=1U3rx1NGYSclNu6I3yP_oJsyHqdO74p1X)
 
-In this post I will focus on accessing monolith data required by the new service but not owned by it.
+In this post I will focus on accessing monolith data required by the new service, but not owned by it.
 
 For example, in my current project we are creating a new Notifications service. Here we are moving all notification related tables the new Notifications Domain database. But the new domain still have dependencies on data not owned by it. For example, we have the concept of favorite in our website and applications, this favorite help us decide who to send some of our notifications, but favorites data is not owned by the notifications domain. 
 ![](https://drive.google.com/uc?export=view&id=1B8B0fLVS3cCQl6-PyXFi7hDrD2h8Nra2)
