@@ -19,8 +19,8 @@ There are different ways to extract this type of data, they all have some pros a
 There are two main ways to access the data needed from the monolith, you can synchronously request the data to the monolith when you need it, or you can store a copy of the data (a cache) in your local database, in this case you will have to apply a strategy to synchronize your local DB with the monolith DB.
 
 
-# Accessing the data directly
-Depending on the data you need to get, this may put a heavy load on the main database, specially at peak time. The second problem is that you have a direct dependency on aa old complex system that could be very prone to errors (thats why you are splitting your monolith right?), this could take your microservice down very easily, return errors to your users, or worse, hang up until a timeout is triggered.
+# Accessing data directly
+Depending on the data you need to get, this may put a heavy load on the main database, specially at peak time. The second problem is that you have a direct dependency on an old complex system that could be very prone to errors (thats why you are splitting your monolith right?), this could take your microservice down very easily, return errors to your users, or worse, hang up until a timeout is triggered.
 
 A couple of options here are accessing the database directly from your microservice, or call an api on top of the monolith.
 
