@@ -18,10 +18,12 @@ There are different ways to extract this type of data, they all have some pros a
 
 There are two main ways to access the data needed from the monolith, you can synchronously request the data to the monolith when you need it, or you can store a copy of the data (a cache) in your local database, in this case you will have to apply a strategy to synchronize your local DB with the monolith DB.
 
+
 # Accessing the data directly
 Depending on the data you need to get, this may put a heavy load on the main database, specially at peak time. The second problem is that you have a direct dependency on aa old complex system that could be very prone to errors (thats why you are splitting your monolith right?), this could take your microservice down very easily, return errors to your users, or worse, hang up until a timeout is triggered.
 
 A couple of options here are accessing the database directly from your microservice, or call an api on top of the monolith.
+
 
 ## Connecting directly to the database
 This is the most straightforward solution, just pass the connection string to your service and go directly to the source of the data you need. This pose some problems though.
@@ -36,6 +38,7 @@ Chances are this will be impossible with a monolithic database. Running the migr
 
 The advantage of this approach is that it is really fast to implement and fairly simple, making it less likely to fail, but also really hard to evolve.
 
+
 ## API on top of the database
 This solution is very common, it have the advantage over the previous approach in that versioning is easier at the API level. Changes in the database schema can be handle with versioning at the API level.
 
@@ -47,6 +50,7 @@ The testing can become a bit easier, by providing a 'sandbox' call where you ret
 
 It is still a pretty fast and straightforward option, but it adds a new point of failure to your application, meaning you will need more tests for the new API, and possible new deployments.
 
+
 # Creating a local copy of the data asynchronously
 A very [common solutions](https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/asynchronous-message-based-communication) in the microservices world. Instead of synchronously accessing the monolith database, we create a copy of the data we need in a local database, fill it asynchronously either by loading directly from a database in a fixed time (a cron job), or by exporting the data from the monolith using a messaging or streaming system, i.e RabbitMQ or Kafka.
 
@@ -54,10 +58,12 @@ A very [common solutions](https://docs.microsoft.com/en-us/dotnet/standard/micro
 
 This approach usually take more time to develop, and you will also have to deal with [Eventual consistency](https://en.wikipedia.org/wiki/Eventual_consistency) problems. But they are also more resilience and less prone to failures.
 
+
 ## Syncing data at fixed times
 It is a pretty straightforward option, have a cron job or something equivalent (even a job triggered manually) query the database at fixed times, usually when the load on the main database is not so heavy, and dump the data in your local database. The main disadvantage of this method is that your data will be out of sync most of the time. This is a typical solution to extract data that doesn't change so much over time, like a countries table. 
 
 ![](https://drive.google.com/uc?export=view&id=1xCpamWEYmCbvm1S5_vUz9bsRTBL9i-RD)
+
 
 ## Streaming data out of the monolith
 The most complex solution, but the best approach if you don't want to overload the monolith DB, and it can keep the consistency between the two system in a small time window. 
@@ -66,7 +72,7 @@ The most complex solution, but the best approach if you don't want to overload t
 
 Typically, the monolith exports the data as messages/events in some sort of streaming system, like kafka or rabbitMQ. Then have a consumer in the microservice reading the data and storing it in its local DB.
 
-There are different techniques to publish messages from the monolith. You can publish them directly to the messaging system after storing the data in your database. Another solution is to connect directly to the database engine transaction log and publish this log to the messaging system. A third solution is to use the outbox pattern, storing the messages in another table in the monolith DB, to later be published to your messaging system by another process.
+There are different techniques for publishing messages from the monolith. You can publish them directly to the messaging system after storing the data in your database. Another option is connecting directly to the database engine transaction log and publish this log to the messaging system. A third technique, the outbox pattern, consist in storing the messages in another the monolith DB table, and later be published by another process. A four solution would be a bit of the opposite of the outbox pattern, the monolith first publish the event to the broker, and then listen to the same event that triggers the storing in the database.
 
 
 ### Publishing the event from code
@@ -86,23 +92,24 @@ The biggest problem with this is how do you handle bugs introduced in the code o
 
 For example, you could have an hotel reservation system that save a reservation in the database and then publish a message to rabbit, so the payment system can charge the user. If there is an error at some point, you may rollback the DB transaction, but already emitted the event to the payment system, charging the users credit card even though he will not have any reservation in your database.  
 
+
 ### Using the database transaction log
-Typically know as [transaction log tailing](https://microservices.io/patterns/data/transaction-log-tailing.html). In this solution you connect to the transaction log of the database, publishing the events that come from it (for example, INSERT, UPDATE and DELETE events). 
-This approach is usually very difficult to implement. DB engines don't tend to provide an easy way to read the transaction log (it is more of a internal implementation detail), so connecting to it can require low level code, making it a quite complex solution. It will also be tailored to the DB engine you are connecting to.
+Typically know as [transaction log tailing](https://microservices.io/patterns/data/transaction-log-tailing.html). In this technique you connect to the transaction log of the database, publishing the events that come from it (for example, INSERT, UPDATE and DELETE events). 
+This approach is usually very difficult to implement. DB engines don't tend to provide an easy way for reading the transaction log (it is more of a internal implementation detail), so connecting to it can require low level code, making it a quite complex solution. It will also be tailored to the DB engine you are connecting to.
 
 ![](https://drive.google.com/uc?export=view&id=1WXkMp8ctoTqUX4fP6EvzjuwcJuxnOIHS)
 
-Some databases vendors have solutions for this type of data extraction, but it tend to be on a very expensive enterprise packages. For example, [Oracle GoldenGate](https://www.oracle.com/middleware/technologies/goldengate.html) allows you to stream data from a Oracle database to other systems. 
+Some databases vendors have products for this type of data extraction, but it tend to be on a very expensive enterprise packages. For example, [Oracle GoldenGate](https://www.oracle.com/middleware/technologies/goldengate.html) allows you to stream data from a Oracle database to other systems. 
 
-If you are using Azure SQL (there are solution)[https://docs.microsoft.com/en-us/azure/sql-database/sql-database-sync-data] to extract data out of it, but this could imply a tight vendor lock-in.
+If you are using Azure SQL (there are options)[https://docs.microsoft.com/en-us/azure/sql-database/sql-database-sync-data] to extract data out of it, but this could imply a tight vendor lock-in.
 
 If you are using kafka, there is also [confluent](https://www.confluent.io/). They provide connectors to extract data out of a database to kafka, usually by streaming the event log of the engine to kafka, and also to unload data from kafka to another system. The main drawback of this solutions is that building and maintaining a kafka cluster can be hard and quite expensive in resources. Some of the connectors are also on early development stage, and they may not be reliable in a production environment. 
 
-A very similar solution to confluent is [debezium](https://debezium.io/), an open source project from redhat, also consisting on connectors from the database transaction log to kafka.
+A very similar option to confluent is [debezium](https://debezium.io/), an open source project from redhat, also consisting on connectors from the database transaction log to kafka.
 
 
 ### The outbox pattern 
-[This](https://docs.particular.net/nservicebus/outbox/) is a [solution](http://gistlabs.com/2014/05/the-outbox/) we are using in my current project. The idea is to have an outbox table in your DB where you will store the events you want to publish in the same DB transaction where you are storing your actual data, giving a much better guarantee of keeping data consistency, compared to publishing the event from code.
+[This](https://docs.particular.net/nservicebus/outbox/) is a [pattern](http://gistlabs.com/2014/05/the-outbox/) we are using in my current project. The idea is to have an outbox table in your DB where you will store the events you want to publish in the same DB transaction where you are storing your actual data, giving a much better guarantee of keeping data consistency, compared to publishing the event from code.
 
 ![](https://drive.google.com/uc?export=view&id=1Rt8TvbHOoNIDDVn1Sl42TYRQuE4zrCIa)
 
@@ -110,13 +117,22 @@ There are different ways to do this, if you are using an ORM you can insert in t
 
 If you are using Stored Procedures you can insert in the outbox table there.
 
-Another option is to capture the changes using a db trigger over the table that contains the data you want to take out, in this trigger you can store in the outbox table. This is a good solution when you have a big codebase, with multiple stored procedures, and don't really know for sure where is the data being updated, but it should be treated as a last resource, triggers are usually hard to maintain, 
+Another option is to capture the changes using a db trigger over the table that contains the data you want to take out, in this trigger you can store in the outbox table. This is a good option when you have a big codebase, with multiple stored procedures, and don't really know for sure where is the data being updated, but it should be treated as a last resource, triggers are usually hard to maintain, 
 
 After storing the outbox table, you will need a cron job to regularly read this table and publish the events to your streaming service, maybe extracting additional data when necessary. You have to be careful though, additional queries should only be done on indexed columns, so you don't overload the database.
+
+
+### Listen to yourself
+[This technique](https://medium.com/@odedia/listen-to-yourself-design-pattern-for-event-driven-microservices-16f97e3ed066) consist on first publishing the data in a single transaction, and make the monolith listen to this event and then store the data in the database.
+
+![](https://drive.google.com/uc?export=view&id=1AQSa4QDMlcC1SE8oWnOSuYo_FH1beNez)
+
+This is a great technique for sharing data in microservices, but it may not be the best to extract data out of the monolith. Your system is probably made to store data synchronously in the database, and make it immediately available to the client. The changes from this pattern may spam some undesired side effects.
+
 
 # What is the best solution? #
 I think all the solutions have their use case, and they all should be taken into account when designing your system.
 
-Synchronous solutions have to be done with care, they make your microservice more tightly couple to the monolith, and problems like network errors, versioning and code bugs will we easier to propagate from one system to another.
+Synchronous options have to be done with care, they make your microservice more tightly couple to the monolith, and problems like network errors, versioning and code bugs will we easier to propagate from one system to another.
 
-Asynchronous solutions are usually better for making your services more resilience and loosely couple, but they introduce more architecture and infrastructure complexity. Out of all the solutions, the only one I don't think should ever be done is publishing the events from code, the potential risk and errors introduced with this solution far outweighs the benefits of implementing it.
+Asynchronous techniques are usually better for making your services more resilience and loosely couple, but they introduce more architecture and infrastructure complexity. Out of all the solutions, the only one I don't think should ever be done is publishing the events from code, the potential risk and errors introduced with this technique far outweighs the benefits of implementing it.
