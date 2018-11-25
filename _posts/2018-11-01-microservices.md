@@ -74,6 +74,8 @@ Typically, the monolith exports the data as messages/events in some sort of stre
 
 There are different techniques for publishing messages from the monolith. You can publish them directly to the messaging system after storing in your database. Another option is connecting directly to the database engine transaction log and publish this log to the messaging system. A third technique, the outbox pattern, consist in storing the messages in another monolith DB table, and later be published by another process. A fourth solution would be a bit of the opposite of the outbox pattern, the monolith first publish the event to the broker, and then listen to the same event, triggering the storing of the data in the DB.
 
+Besides eventual consistency, you wil also have to be careful with message duplication, usually message queues implement the [only once delivery](http://www.cloudcomputingpatterns.org/at_least_once_delivery/) pattern, so this is something you have to take into account in your message handlers.
+
 
 ### Publishing the event from code
 This is the easiest to implement, but also [the worst](https://jimmybogard.com/refactoring-towards-resilience-evaluating-coupling#rabbitmqcoupling) of the 4 given solutions. This is done in code by sending the message to the streaming service in the same block you store in the database.
@@ -123,11 +125,11 @@ After storing the outbox table, you will need a cron job to regularly read this 
 
 
 ### Listen to yourself
-[This technique](https://medium.com/@odedia/listen-to-yourself-design-pattern-for-event-driven-microservices-16f97e3ed066) consist on first publishing the data in a single transaction, and make the monolith listen to this event and then store the data in the database.
+[This technique](https://medium.com/@odedia/listen-to-yourself-design-pattern-for-event-driven-microservices-16f97e3ed066) consist on first publishing the data in a single transaction, and make the monolith listen to this event and then store the data in the DB.
 
 ![](https://drive.google.com/uc?export=view&id=1AQSa4QDMlcC1SE8oWnOSuYo_FH1beNez)
 
-This is a great technique for sharing data in microservices, but it may not be the best to extract data out of the monolith. Your system is probably made to store data synchronously in the database, and make it immediately available to the client. The changes from this pattern may spam some undesired side effects.
+This is a great technique for sharing data in microservices, but it may not be the best to extract data out of the monolith. Your system is probably made to store data synchronously in the database, and make it immediately available to the client. The changes from this pattern may spam some undesired side effects, for example, your monolith may not be prepared to handle message duplication you get because of the only once delivery pattern from your broker, making you insert twice the same data in the DB.
 
 
 # What is the best solution? #
