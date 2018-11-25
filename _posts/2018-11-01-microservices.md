@@ -16,7 +16,7 @@ For example, in my current project we are creating a new Notifications service. 
 
 There are different ways to extract this type of data, they all have some pros and cons, some of them are generally better, but in the end it depends of your use case. 
 
-There are two main ways to access the data needed from the monolith, you can synchronously request the data to the monolith when you need it, or you can store a copy of the data (a cache) in your local database, in this case you will have to apply a strategy to synchronize your local DB with the monolith DB.
+There are two main ways to access the data needed from the monolith, you can synchronously request the data when you need it, or you can store a copy of the data (a cache) in your local database, in this case you will have to apply a strategy to synchronize your local DB with the monolith DB.
 
 
 # Accessing data directly
