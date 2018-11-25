@@ -86,7 +86,7 @@ SendToRabbit(data);
 
 The problem with this approach is that you can't guarantee the transaction between the two systems. Messaging systems like RabbitMQ don't even [support](https://tech.labs.oliverwyman.com/blog/2016/10/25/rabbitmq-and-transactions/) two phase commit. 
 
-Then you have the problem of which order the transaction will be done. If you first send your message to rabbit, and after the database transaction fail, you have already send wrong data to the the other systems. If you update the database first but publishing the message fails, you may never get the new data in your microservices, making the data inconsistent between the two systems. Recovering from this type of issues can be really hard, or worse, they may not even be noticed at all.
+This span the issue of which order will the transaction be done. If you first send your message to rabbit, and after the database transaction fail, you have already send wrong data to the the other systems. If you update the database first but publishing the message fails, you may never get the new data in your microservices, making the data inconsistent between the two systems. Recovering from this type of issues can be really hard, or worse, they may not even be noticed at all.
 
 The biggest problem with this is how do you handle bugs introduced in the code or network errors. Usually when you insert in the database, you can rollback this transaction, and in general you will have a retry mechanism in case an exception occur. If you publish to both systems in the same code block, retry policies become almost impossible to implement. What happen if you published to Rabbit but then you rollback the database change?.
 
