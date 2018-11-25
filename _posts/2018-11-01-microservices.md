@@ -76,7 +76,7 @@ There are different techniques for publishing messages from the monolith. You ca
 
 
 ### Publishing the event from code
-This is the easiest to implement, but also [the worst](https://jimmybogard.com/refactoring-towards-resilience-evaluating-coupling#rabbitmqcoupling) of the 3 given solutions. This is done in code by sending the message to the streaming service in the same block you store in the database.
+This is the easiest to implement, but also [the worst](https://jimmybogard.com/refactoring-towards-resilience-evaluating-coupling#rabbitmqcoupling) of the 4 given solutions. This is done in code by sending the message to the streaming service in the same block you store in the database.
 
 ``` 
 UpdateDB(data);
