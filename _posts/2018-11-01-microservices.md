@@ -36,11 +36,11 @@ Testing can also be very difficult with this approach. In modern developments is
 
 Chances are this will be impossible with a monolithic database. Running the migration scripts on a 5 year behemoth could take a very long time, and filling test data in a database with tables spamming foreign keys around multiple places could be a complete nightmare. 
 
-The advantage of this approach is that it is really fast to implement and fairly simple, making it less likely to fail, but also really hard to evolve.
+The advantage of this approach is that it is really fast and fairly simple to implement, making it less likely to fail, but also really hard to evolve.
 
 
 ## API on top of the database
-This solution is very common, it have the advantage over the previous approach in that versioning is easier at the API level. Changes in the database schema can be handle with versioning at the API level.
+This solution is very common, it have the advantage over the previous approach in that versioning is easier at the API level.
 
 ![](https://drive.google.com/uc?export=view&id=1uPeZsVl06or0f6RQlP9jy0pKlC2Lpt0H)
 
