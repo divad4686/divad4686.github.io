@@ -101,7 +101,7 @@ This approach is usually very difficult to implement. DB engines don't tend to p
 
 Some databases vendors have products for this type of data extraction, but it tend to be on a very expensive enterprise packages. For example, [Oracle GoldenGate](https://www.oracle.com/middleware/technologies/goldengate.html) allows you to stream data from a Oracle database to other systems. 
 
-If you are using Azure SQL (there are options)[https://docs.microsoft.com/en-us/azure/sql-database/sql-database-sync-data] to extract data out of it, but this could imply a tight vendor lock-in.
+If you are using Azure SQL [there are options](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-sync-data) to extract data out of it, but this could imply a tight vendor lock-in.
 
 If you are using kafka, there is also [confluent](https://www.confluent.io/). They provide connectors to extract data out of a database to kafka, usually by streaming the event log of the engine to kafka, and also to unload data from kafka to another system. The main drawback of this solutions is that building and maintaining a kafka cluster can be hard and quite expensive in resources. Some of the connectors are also on early development stage, and they may not be reliable in a production environment. 
 
