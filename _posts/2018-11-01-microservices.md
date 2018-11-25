@@ -34,7 +34,7 @@ First, any change in the database could break your service, you will be extremel
 
 Testing can also be very difficult with this approach. In modern developments is increasingly more common to deploy your dependencies locally with docker, including recreating your database anytime you want, for example, when running integration tests. 
 
-Chances are this will be impossible with a monolithic database. Running the migration scripts on a 5 year behemoth could take a really long time, and filling test data in a database with tables spamming foreign keys around multiple places could be a complete nightmare. 
+Chances are this will be impossible with a monolithic database. Running the migration scripts on a 5 year behemoth could take a very long time, and filling test data in a database with tables spamming foreign keys around multiple places could be a complete nightmare. 
 
 The advantage of this approach is that it is really fast to implement and fairly simple, making it less likely to fail, but also really hard to evolve.
 
