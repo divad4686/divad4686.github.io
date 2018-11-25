@@ -72,7 +72,7 @@ The most complex solution, but the best approach if you don't want to overload t
 
 Typically, the monolith exports the data as messages/events in some sort of streaming system, like kafka or rabbitMQ. Then have a consumer in the microservice reading the data and storing it in its local DB.
 
-There are different techniques for publishing messages from the monolith. You can publish them directly to the messaging system after storing the data in your database. Another option is connecting directly to the database engine transaction log and publish this log to the messaging system. A third technique, the outbox pattern, consist in storing the messages in another the monolith DB table, and later be published by another process. A four solution would be a bit of the opposite of the outbox pattern, the monolith first publish the event to the broker, and then listen to the same event that triggers the storing in the database.
+There are different techniques for publishing messages from the monolith. You can publish them directly to the messaging system after storing in your database. Another option is connecting directly to the database engine transaction log and publish this log to the messaging system. A third technique, the outbox pattern, consist in storing the messages in another the monolith DB table, and later be published by another process. A four solution would be a bit of the opposite of the outbox pattern, the monolith first publish the event to the broker, and then listen to the same event that triggers the storing in the database.
 
 
 ### Publishing the event from code
