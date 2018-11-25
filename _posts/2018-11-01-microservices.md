@@ -51,7 +51,7 @@ The testing can become a bit easier, by providing a 'sandbox' call where you ret
 It is still a pretty fast and straightforward option, but it adds a new point of failure to your application, meaning you will need more tests for the new API, and possible new deployments.
 
 
-# Creating a local copy of the data asynchronously
+# Asynchronously creating a local copy of the data
 A very [common solutions](https://docs.microsoft.com/en-us/dotnet/standard/microservices-architecture/architect-microservice-container-applications/asynchronous-message-based-communication) in the microservices world. Instead of synchronously accessing the monolith database, we create a copy of the data we need in a local database, fill it asynchronously either by loading directly from a database in a fixed time (a cron job), or by exporting the data from the monolith using a messaging or streaming system, i.e RabbitMQ or Kafka.
 
 ![](https://drive.google.com/uc?export=view&id=1RqotsXoWuBh9QhKrLOfSBZz_Qnmhw9Zr)
