@@ -1,6 +1,6 @@
 ---
 layout: post
-title: Data out of monolith
+title: "Microservices techniques: Taking data out of the monolith"
 excerpt_separator: <!--more-->
 hidden: true
 ---
