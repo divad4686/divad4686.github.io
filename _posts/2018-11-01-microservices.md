@@ -6,15 +6,15 @@ hidden: true
 ---
 Going from a monolith to a full microservices architecture is [not an easy task](https://segment.com/blog/goodbye-microservices/), and one of the hardest part is [breaking the database](https://www.youtube.com/watch?v=MrV0DqTqpFU), choosing which data should be moved out of the monolith, and what should stay in it.
 
-The new service will own data that previously belong to the original DB, but it will need to share some of it back to the monolith. Likewise the new service will also have dependencies on data that still belongs to the monolith. 
+The new service will own data that previously belong to the original DB, but it will need to share some of it back to the monolith. Likewise the new service will also have dependencies on data still belonging to the monolith. 
 ![](https://drive.google.com/uc?export=view&id=1U3rx1NGYSclNu6I3yP_oJsyHqdO74p1X)
 
 In this post I will focus on the later problem, accessing monolith data required by the new service, but not owned by it.
 
-For example, in my current project we are creating a new Notifications service. Here we are moving all notification related tables to the new notifications domain database. But the new domain still have dependencies on data not owned by it. For example, we have the concept of favorite in our website and applications, this favorite help us decide who to send some of our notifications, but favorites data is not owned by the notifications domain. 
+For example, in my current project we are creating a new Notifications service. We are moving all related tables to the new notifications database. But the new domain still have dependencies on data not owned by it. For example, we have the concept of favorite in our website and applications, which help us decide who to send some of our notifications, but favorites data is not owned by the notifications domain. 
 ![](https://drive.google.com/uc?export=view&id=1B8B0fLVS3cCQl6-PyXFi7hDrD2h8Nra2)
 
-There are different ways to extract this type of data, they all have some pros and cons, some of them are generally better, but in the end it depends of your use case. 
+There are different ways to extract this type of data, they all have some pros and cons, some of them are generally better, but in the end it depends on your use case. 
 
 There are two main ways to access the data needed from the monolith, you can synchronously request the data when you need it, or you can store a copy of the data (a cache) in your local database, in this case you will have to apply a strategy to synchronize your local DB with the monolith DB.
 
@@ -30,11 +30,11 @@ This is the most straightforward solution, just pass the connection string to yo
 
 ![](https://drive.google.com/uc?export=view&id=1wDNMrl7VpSiQtJXOTW2ekngv_pKn1uil)
 
-First, any change in the database could break your service, you will be extremely coupled to the main database schema, taking away some of the benefits of creating a separate service, like independent deployments.
+First, any change in the database could break your service. You will be extremely coupled to the main database schema, taking away some of the benefits of creating a separate service, like independent deployments.
 
-Testing can also be very difficult with this approach. In modern developments is increasingly more common to deploy your dependencies locally with docker, including recreating your database anytime you want, for example, when running integration tests. 
+Testing can also be very difficult with this approach. Recently it have become increasingly more common to deploy your dependencies locally with docker, including recreating your database anytime you want, for example, when running integration tests. 
 
-Chances are this will be impossible with a monolithic database. Running the migration scripts on a 5 year behemoth could take a very long time, and filling test data in a database with tables spamming foreign keys around multiple places could be a complete nightmare. 
+Chances are this will be nearly impossible with a monolithic database. Running the migration scripts on a 5 year behemoth could take a very long time, and filling test data in a database with tables spamming foreign keys around multiple places could be a complete nightmare. 
 
 The advantage of this approach is that it is really fast and fairly simple to implement, making it less likely to fail, but also really hard to evolve.
 
@@ -60,25 +60,25 @@ This approach usually take more time to develop, and you will also have to deal 
 
 
 ## Syncing data at fixed times
-It is a pretty straightforward option, have a cron job or something equivalent (even a job triggered manually) query the database at fixed times, usually when the load on the main database is not so heavy, and dump the data in your local database. The main disadvantage of this method is that your data will be out of sync most of the time. This is a typical solution to extract data that doesn't change so much over time, like a countries table. 
+A pretty straightforward option, have a cron job or something equivalent (even a job triggered manually) query the database at fixed times, usually when the load on the main database is not so heavy, and dump the data in your local storage. The main disadvantage of this method is that your data will be out of sync most of the time. This is a typical solution to extract data that doesn't change so much over time, like a countries table. 
 
 ![](https://drive.google.com/uc?export=view&id=1xCpamWEYmCbvm1S5_vUz9bsRTBL9i-RD)
 
 
 ## Streaming data out of the monolith
-The most complex solution, but the best approach if you don't want to overload the monolith DB, and it can keep the consistency between the two system in a small time window. 
+The most complex solution, but the best approach if you don't want to overload the monolith DB. It can keep the consistency between the two system in a small time window. 
 
 ![](https://drive.google.com/uc?export=view&id=1xqP1bOPNLe8oBmL2BhlzE7NLTOZb2uIX)
 
-Typically, the monolith exports the data as messages/events in some sort of streaming system, like kafka or rabbitMQ. Then have a consumer in the microservice reading the data and storing it in its local DB.
+Typically, the monolith exports the data as messages/events in some sort of streaming system, like kafka or rabbitMQ. Then have a consumer in the new domain reading the data and storing it in the local storage.
 
-There are different techniques for publishing messages from the monolith. You can publish them directly to the messaging system after storing in your database. Another option is connecting directly to the database engine transaction log and publish this log to the messaging system. A third technique, the outbox pattern, consist in storing the messages in another monolith DB table, and later be published by another process. A fourth solution would be a bit of the opposite of the outbox pattern, the monolith first publish the event to the broker, and then listen to the same event, triggering the storing of the data in the DB.
+There are different techniques for publishing messages from the monolith. You can publish them directly to the messaging system after storing in your database. Another option is connecting directly to the database engine transaction log and publish this log to the messaging system. A third technique, the outbox pattern, consist in storing the messages in a monolith DB table, and later be published by another process. A fourth solution would be a bit of the opposite of the outbox pattern, the monolith first publish the event to the broker, and then listen to the same event, triggering the storing of the data in the DB.
 
 Besides eventual consistency, you wil also have to be careful with message duplication, usually message queues implement the [only once delivery](http://www.cloudcomputingpatterns.org/at_least_once_delivery/) pattern, so this is something you have to take into account in your message handlers.
 
 
 ### Publishing the event from code
-This is the easiest to implement, but also [the worst](https://jimmybogard.com/refactoring-towards-resilience-evaluating-coupling#rabbitmqcoupling) of the 4 given solutions. This is done in code by sending the message to the streaming service in the same block you store in the database.
+This is the easiest to implement, but also [the worst](https://jimmybogard.com/refactoring-towards-resilience-evaluating-coupling#rabbitmqcoupling) of the 4 given solutions. It is done in code by sending the message to the streaming service in the same block you store in the database.
 
 ``` 
 UpdateDB(data);
@@ -88,7 +88,7 @@ SendToRabbit(data);
 
 The problem with this approach is that you can't guarantee the transaction between the two systems. Messaging systems like RabbitMQ don't even [support](https://tech.labs.oliverwyman.com/blog/2016/10/25/rabbitmq-and-transactions/) two phase commit. 
 
-This span the issue of which order will the transaction be done. If you first send your message to rabbit, and after the database transaction fail, you have already send wrong data to the the other systems. If you update the database first but publishing the message fails, you may never get the new data in your microservices, making the data inconsistent between the two systems. Recovering from this type of issues can be really hard, or worse, they may not even be noticed at all.
+This span the issue of which order will the transaction be done. If you first send your message to rabbit, and after the database transaction fail, you have already send wrong data to the the other systems. If you update the database first but publishing the message fails, you may never get the new data in your microservices, making the data inconsistent between the two systems. Recovering from this type of issues can be really hard, or worse, they may not even be noticed.
 
 The biggest problem with this is how do you handle bugs introduced in the code or network errors. Usually when you insert in the database, you can rollback this transaction, and in general you will have a retry mechanism in case an exception occur. If you publish to both systems in the same code block, retry policies become almost impossible to implement. What happen if you published to Rabbit but then you rollback the database change?.
 
@@ -105,13 +105,13 @@ Some databases vendors have products for this type of data extraction, but it te
 
 If you are using Azure SQL [there are options](https://docs.microsoft.com/en-us/azure/sql-database/sql-database-sync-data) to extract data out of it, but this could imply a tight vendor lock-in.
 
-If you are using kafka, there is also [confluent](https://www.confluent.io/). They provide connectors to extract data out of a database to kafka, usually by streaming the event log of the engine to kafka, and also to unload data from kafka to another system. The main drawback of this solutions is that building and maintaining a kafka cluster can be hard and quite expensive in resources. Some of the connectors are also on early development stage, and they may not be reliable in a production environment. 
+If you are using kafka, there is also [confluent](https://www.confluent.io/). They provide connectors to extract data out of a database to kafka, usually by streaming the engine event log. There are also to unload data from kafka to another system. The main drawback of this solutions is that building and maintaining a kafka cluster can be hard and quite expensive in resources. Some of the connectors are also on early development stage, and they may not be reliable in a production environment. 
 
 A very similar option to confluent is [debezium](https://debezium.io/), an open source project from redhat, also consisting on connectors from the database transaction log to kafka.
 
 
 ### The outbox pattern 
-[This](https://docs.particular.net/nservicebus/outbox/) is a [pattern](http://gistlabs.com/2014/05/the-outbox/) we are using in my current project. The idea is to have an outbox table in your DB where you will store the events you want to publish in the same DB transaction where you are storing your actual data, giving a much better guarantee of keeping data consistency, compared to publishing the event from code.
+[This](https://docs.particular.net/nservicebus/outbox/) is a [pattern](http://gistlabs.com/2014/05/the-outbox/) we are using in my current project. The idea is to have an outbox table in your DB to store the events you want to publish. This table is updated in the same transaction where the actual data is being stored, giving a much better guarantee of keeping data consistency, compared to publishing the event from code.
 
 ![](https://drive.google.com/uc?export=view&id=1Rt8TvbHOoNIDDVn1Sl42TYRQuE4zrCIa)
 
@@ -119,7 +119,7 @@ There are different ways to do this, if you are using an ORM you can insert in t
 
 If you are using Stored Procedures you can insert in the outbox table there.
 
-Another option is to capture the changes using a db trigger over the table that contains the data you want to take out, in this trigger you can store in the outbox table. This is a good option when you have a big codebase, with multiple stored procedures, and don't really know for sure where is the data being updated, but it should be treated as a last resource, triggers are usually hard to maintain, 
+Another option is to capture the changes using a db trigger over the table that contains the data you want to take out. In this trigger you can store in the outbox table. This is a good option when you have a big codebase, with multiple stored procedures, and don't really know for sure where is the data being updated, but it should be treated as a last resource, triggers are usually hard to maintain, 
 
 After storing the outbox table, you will need a cron job to regularly read this table and publish the events to your streaming service, maybe extracting additional data when necessary. You have to be careful though, additional queries should only be done on indexed columns, so you don't overload the database.
 
@@ -129,7 +129,7 @@ After storing the outbox table, you will need a cron job to regularly read this 
 
 ![](https://drive.google.com/uc?export=view&id=1AQSa4QDMlcC1SE8oWnOSuYo_FH1beNez)
 
-This is a great technique for sharing data in microservices, but it may not be the best to extract data out of the monolith. Your system is probably made to store data synchronously in the database, and make it immediately available to the client. The changes from this pattern may spam some undesired side effects, for example, your monolith may not be prepared to handle message duplication you get because of the only once delivery pattern from your broker, making you insert twice the same data in the DB.
+This is a great technique for sharing data in microservices, but it may not be the best to extract data out of a monolith. Your system is probably made to store data synchronously in the database, and make it immediately available to the client. The changes from this pattern may spam some undesired side effects, for example, your monolith may not be prepared to handle message duplication you get because of the only once delivery pattern from your broker, making you insert the same data twice in the DB.
 
 
 # What is the best solution? #
@@ -137,4 +137,4 @@ I think all the solutions have their use case, and they all should be taken into
 
 Synchronous options have to be done with care, they make your microservice more tightly couple to the monolith, and problems like network errors, versioning and code bugs will we easier to propagate from one system to another.
 
-Asynchronous techniques are usually better for making your services more resilience and loosely couple, but they introduce more architecture and infrastructure complexity. Out of all the solutions, the only one I don't think should ever be done is publishing the events from code, the potential risk and errors introduced with this technique far outweighs the benefits of implementing it.
+Asynchronous techniques are usually better for making your services more resilience and loosely couple, but they introduce more architecture and infrastructure complexity. Out of all the solutions, the only one I don't think should ever be done is publishing the events from code. The potential risk and errors introduced with this technique far outweighs the benefits of implementing it.
