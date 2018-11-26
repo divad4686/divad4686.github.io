@@ -2,7 +2,6 @@
 layout: post
 title: "Microservices techniques: Taking data out of the monolith"
 excerpt_separator: <!--more-->
-hidden: true
 ---
 Going from a monolith to a full microservices architecture is [not an easy task](https://segment.com/blog/goodbye-microservices/), and one of the hardest part is [breaking the database](https://www.youtube.com/watch?v=MrV0DqTqpFU), choosing which data should be moved out of the monolith, and what should stay in it.
 
