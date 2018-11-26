@@ -14,6 +14,8 @@ Each stream represents a quest, and it can hold the [following events](https://g
 
 For our reading side, we have two aggregates, [QuestParty](https://github.com/divad4686/marten-example/blob/master/src/quest/Aggregates/QuestParty.cs), with general information like the current members of the quest, and [MonstersSlayed](https://github.com/divad4686/marten-example/blob/master/src/quest/Aggregates/MonstersSlayed.cs), containing the pigs and bosses we have killed so far.
 
+<!--more-->
+
 The typical Marten implementation for this aggregates would be something like this:
 {% highlight c# %}
 public class QuestParty
