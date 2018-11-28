@@ -27,6 +27,7 @@ plugins:
   - jekyll-paginate
   - jekyll-admin
   - jekyll-seo-tag
+  - jekyll-sitemap
 
 # Custom vars
 sidebar_home_link:  true
