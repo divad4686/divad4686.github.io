@@ -32,7 +32,7 @@ In a microservices application, it is very common to have a service sending comm
 This type of architecture has become so common that is very easy to associate CQRS with eventual consistency, but this concepts are completely different, as we saw before, you can apply CQRS in a monolith application over a single, strong consistent database engine.
 
 # So, what is Eventual consistency?
-[It is a distributed system model](https://en.wikipedia.org/wiki/Eventual_consistency) 
+[It is a distributed system model](https://en.wikipedia.org/wiki/Eventual_consistency). In a strong consistent model, when you execute a transaction against the system, when the system response back with a success you are guarantee that the entire system will immediately contain the changes you made. 
 
 that can cause issues in determined use cases. The typical example when it can be an issue is when you need to do a query in the system immediately after executing a command. In a eventual consistent system, the query may not return the updated state from the previous command.
 ![](https://drive.google.com/uc?export=view&id=1vTJECK-HxTkuxX5KAAm4xixVH9fROPdJ)
