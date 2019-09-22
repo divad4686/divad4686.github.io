@@ -1,2 +1,10 @@
+## install
+```
+gem install bundler jekyll
+```
 
-My blog
+## Execute
+
+```
+bundle exec jekyll serve
+```

@@ -1,25 +1,25 @@
 # Dependencies
-markdown:         kramdown
-highlighter:      rouge
+markdown: kramdown
+highlighter: rouge
 
 # Setup
-title:            David blog
-tagline:          'A .net developer blog'
-description:      'A .Net blog '
-url:              https://divad4686.github.io
-baseurl:          # the optional subpath of your site, e.g. "/blog"
-                  # NB: This applies to all pages in your Jekyll site.
-                  # If you want to move just the blog index pages but keep
-                  # other pages at root, see the paginate_path and
-                  # sidebar_blog_link below.
+title: David blog
+tagline: "A back end developer blog"
+description: "A back-end developer blog"
+url: https://divad4686.github.io
+baseurl:# the optional subpath of your site, e.g. "/blog"
+  # NB: This applies to all pages in your Jekyll site.
+  # If you want to move just the blog index pages but keep
+  # other pages at root, see the paginate_path and
+  # sidebar_blog_link below.
 
 author:
-  name:           'David Martinez'
-  url:            https://twitter.com/divad4686
+  name: "David Martinez"
+  url: https://twitter.com/divad4686
 
-paginate:         5
+paginate: 5
 # paginate_path:    '/page:num'
-                    # Or '/blog/page:num' if you want to move your index pages
+# Or '/blog/page:num' if you want to move your index pages
 
 plugins:
   - jekyll-feed
@@ -30,13 +30,13 @@ plugins:
   - jekyll-sitemap
 
 # Custom vars
-sidebar_home_link:  true
+sidebar_home_link: true
 # sidebar_blog_link:  '/blog'   # By default, your home page is your blog
-                                # page. If you change your paginate_path,
-                                # set this to the root of the paginate_path
-                                # to enable a separate blog link.
+# page. If you change your paginate_path,
+# set this to the root of the paginate_path
+# to enable a separate blog link.
 github:
-  repo:             https://github.com/divad4686/
+  repo: https://github.com/divad4686/
 
 twitter: https://twitter.com/divad4686
 linkedIn: https://www.linkedin.com/in/divad4686/
