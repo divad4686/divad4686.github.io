@@ -4,17 +4,17 @@ title: "CQS, CQRS, eventual consistency, what do this all mean?"
 excerpt_separator: <!--more-->
 hidden: true
 ---
-With the rise and evolution of microservices technologies, there has been some new concepts being develop in the past few years, and also old concepts that are starting to get traction again.
+With the rise and evolution of [microservices architectures](https://microservices.io/), there has been some new concepts being develop in the past few years, and also old concepts that are starting to get traction again.
 
-But what do this concept actually mean? how are they related to each other? 
+But what do this concepts actually mean? how are they related to each other? 
 
-Here I'm trying to give my vision of this concepts, from my research on how they are used, specially whom I consider to be some of the leaders on the field. 
+Here I'm trying to give my vision of this concepts, from my research on how they are used, specially by whom I consider to be some of the leaders on the field. 
 
 # What is CQS?
 
-CQS is a principle that state that you should either have void methods that change state (commands) but don't return any value, or query methods that return a value but should not modify state.
+CQS is a principle that state that you should either have void methods that change state (commands) but don't return any value, or query methods that return a value but should not modify the state.
 
-An example of CQS is IEnumerable in C#. IEnumerable have a MoveNext() command that modifies the state but returns nothing, and a query Current() method that returns the current element, but doesn't modify the state of the collection.
+An example of CQS is IEnumerable interface in C#. IEnumerable have a MoveNext() command that modifies the state but returns nothing, and a query Current() method that returns the current element, but doesn't modify the state of the collection.
 
 An example of something not doing CQS is the typical Queue implementation, where you have a Pop() method that remove the top element of the queue, modifying the state, and it also returns the value of this element. 
 
@@ -23,19 +23,19 @@ Check this great Gregg Young talk [CQRS and Event Sourcing](https://www.youtube.
 # CQRS
 [CQRS](https://martinfowler.com/bliki/CQRS.html) pattern main idea is that responsibility of commands and queries should be in different modules. 
 
-Different modules can mean different assemblies in your project, different services in a microservices architecture but it can also just be different classes inside your application, even if it is one singe monolith.
+Different modules can mean different assemblies in your project, it can also be different services in a microservices architecture or it can just be different classes inside your application, even if it is one singe monolith.
 
 # Do you need 2 databases to apply CQRS?
 ![](https://drive.google.com/uc?export=view&id=17WETpbeYTGyd1rAIwCsuXmg43N5GhtkF)
-You don't, the pattern can be applied using the same database, it can even be with the same data model. The pattern only dictates to separate the services where you do the commands and the queries. Now, it is very natural that since the queries and commands are separated, that you also use two different data models for then.
+You don't, the pattern can be applied using the same database, it can even be with the same data model. The pattern only dictates to separate the services where you do the commands and the queries. Now, it is very natural that since the queries and commands are separated, that you also use two different data models for them.
 
 
 # CQRS and eventual consistency
 ![](https://drive.google.com/uc?export=view&id=19Z8VYL8PMNMiJH5spwlQ9DXUETRB3T6D)
-In a microservices application, it is very common to have a service sending commands over a messaging system like RabbitMQ, and later another process picking this message up, writing to a user facing read database, and later the user executing queries against this database. In this type of architecture you are already applying CQRS, your commands are being processed by a separate service over the network that the service handling your queries. Also, when using a messaging system, you are naturally using the eventual consistency distributed model.
+In a microservices application, it is very common to have a service sending commands over a messaging system like RabbitMQ, and later another process picking this message up, writing to a user facing read database, and later have some user executing queries against this database. In this type of architecture you are already applying CQRS, your commands are being processed by a separate service over the network than the service handling your queries. Also, when using a messaging system, you are naturally using the eventual consistency distributed model.
 
 ![CQRS in a microservices system](https://drive.google.com/uc?export=view&id=19Kd2GbUKecfrO9qe90o3At6owYG51MoV)
-This type of architecture has become so common that is very easy to associate CQRS with eventual consistency, but this concepts are completely different, as we saw before, you can apply CQRS in a monolith application over a single, strong consistent database engine.
+This type of architecture has become so common that is very easy to associate CQRS with eventual consistency, but this concepts are completely different, and as we saw before, you can apply CQRS in a monolith application over a single, strongly consistent database engine.
 
 # So, what is eventual consistency?
 [It is a distributed system model](https://en.wikipedia.org/wiki/Eventual_consistency). In a strong consistent model,  after a transaction is executed against the system, and it response back with a success, you are guarantee that the entire system will immediately contain the changes made. This is what can be seen in a SQL database with ACID guarantees, with replicas across the network.
@@ -55,4 +55,4 @@ An example where eventual consistency is not an issue could be when you are impo
 # And event sourcing?
 [Event sourcing](https://www.youtube.com/watch?v=8JKjvY4etTY) consist on storing the state of your application as an immutable log of events, instead of (for example) using a relational model. This concept is typically associated with microservices, mostly because it is common to use [events to propagate changes](https://en.wikipedia.org/wiki/Event-driven_architecture) in your application across different microservices. 
 
-But it is perfectly viable to have a single monolith that use event sourcing to persist the application state.
+But it is perfectly viable to have a single monolith with one database that use event sourcing to persist the application state.
