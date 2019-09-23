@@ -32,7 +32,9 @@ You don't, the pattern can be applied using the same database, it can even be wi
 
 # CQRS and eventual consistency
 ![](https://drive.google.com/uc?export=view&id=19Z8VYL8PMNMiJH5spwlQ9DXUETRB3T6D)
-In a microservices application, it is very common to have a service sending commands over a messaging system like RabbitMQ, and later another process picking this message up, writing to a user facing read database, and later have some user executing queries against this database. In this type of architecture you are already applying CQRS, your commands are being processed by a separate service over the network than the service handling your queries. Also, when using a messaging system, you are naturally using the eventual consistency distributed model.
+In a microservices application, it is very common to have a service sending commands over a messaging system like RabbitMQ, and later another process picking this message up, writing to a user facing read database, and later have some user execute queries against this database. 
+
+In this type of architecture you are already applying CQRS, your commands are being processed by a separate service over the network than the service handling your queries. Also, when using a messaging system, you are naturally using the eventual consistency distributed model.
 
 ![CQRS in a microservices system](https://drive.google.com/uc?export=view&id=19Kd2GbUKecfrO9qe90o3At6owYG51MoV)
 This type of architecture has become so common that is very easy to associate CQRS with eventual consistency, but this concepts are completely different, and as we saw before, you can apply CQRS in a monolith application over a single, strongly consistent database engine.
