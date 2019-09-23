@@ -2,7 +2,7 @@
 layout: post
 title: "CQS, CQRS, eventual consistency, what do this all mean?"
 excerpt_separator: <!--more-->
-hidden: true
+hidden: false
 ---
 With the rise and evolution of [microservices architectures](https://microservices.io/), there has been some new concepts being develop in the past few years, and also old concepts that are starting to get traction again.
 
